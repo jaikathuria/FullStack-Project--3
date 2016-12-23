@@ -1,0 +1,63 @@
+
+{% extends "base.html "%}
+{% block content %}
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('img/post-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1> {{ post.subject }} </h1>
+                        <span class="meta">Posted by <a href="/"> {{ post.author }} </a> on {{ post.created.strftime("%b %d, %Y") }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Post Content -->
+    <article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    {{ post.content | safe }}
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <hr>
+    <!-- Contenedor Principal -->
+	<div class="comments-container">
+		<ul id="comments-list" class="comments-list">
+			<li>
+				<div class="comment-main-level">
+					<div class="comment-box">
+						<div class="comment-head">
+							<h6 class="comment-name by-author"><a href="http://creaticode.com/blog">Agustin Ortiz</a></h6>
+							<span>hace 20 minutos</span>
+						</div>
+						<div class="comment-content">
+							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo?
+						</div>
+					</div>
+				</div>
+			</li>
+
+			<li>
+				<div class="comment-main-level">
+					<div class="comment-box">
+						<div class="comment-head">
+							<h6 class="comment-name"><a href="http://creaticode.com/blog">Lorena Rojero</a></h6>
+							<span>10 minutos ago</span>
+						</div>
+						<div class="comment-content">
+							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo?
+						</div>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+{% endblock %}
