@@ -27,11 +27,11 @@ class Post(db.Model):
     author = db.StringProperty(required = True)
     last_modified = db.DateTimeProperty(auto_now = True)
 
-#class Comments(db.Model):
-#   author = db.StringProperty(required = True)
-#    content = db.TextProperty(required = True)
-#    post_id = 
-#    created = db.DateTimeProperty(auto_now_add = True)
+class Comments(db.Model):
+    author = db.StringProperty(required = True)
+    content = db.TextProperty(required = True)
+    post_id = db.ReferenceProperty(required = True) 
+    created = db.DateTimeProperty(auto_now_add = True)
     
 class User_db(db.Model):
     fname = db.StringProperty(required = True)
