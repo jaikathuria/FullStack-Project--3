@@ -510,3 +510,9 @@ body {
 }
 
 /*--Comments-Style-Close-*/
+.margin-bottom{
+    margin-bottom: 50px;
+}
+.no-padding{
+    padding: 6px 12px;
+}
