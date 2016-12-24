@@ -28,7 +28,7 @@
                         </h2>
 
                     </a>
-                    <p class="post-meta">Posted by <a href="/">{{ p.author }}</a> on {{ p.created.strftime("%b %d, %Y") }} </p>
+                    <p class="post-meta">Posted by <a href="/">{{ p.author }}</a> on {{ p.last_modified.strftime("%b %d, %Y") }} </p>
                 </div>
                 <hr>
               {% endfor %}

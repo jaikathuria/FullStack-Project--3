@@ -26,12 +26,14 @@ class Post(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
     author = db.StringProperty(required = True)
     last_modified = db.DateTimeProperty(auto_now = True)
+    post_likes = db.IntegerProperty(required = True)
 
 class Comments(db.Model):
     author = db.StringProperty(required = True)
     content = db.TextProperty(required = True)
-    post_id = db.ReferenceProperty(required = True) 
     created = db.DateTimeProperty(auto_now_add = True)
+    last_modified = db.DateTimeProperty(auto_now = True)
+    
     
 class User_db(db.Model):
     fname = db.StringProperty(required = True)
@@ -96,12 +98,16 @@ class PostPage(Handler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-
+        
         if not post:
             self.error(404)
             return
-
-        self.render("post.html", post = post, user = self.logged())
+    ##---- Dummy Comment Creation
+        #new_comment = Comments(author = post.author, content = "Dummy Comment . . .", parent = post)
+        #new_comment.put()
+        comments = Comments.all()
+        comments.ancestor(key)
+        self.render("post.html", post = post, user = self.logged(), comments = comments)
 class DeletePost(Handler):
     def get(self,post_id):
         key = db.Key.from_path('Post',int(post_id), parent=blog_key())
@@ -132,7 +138,7 @@ class NewPost(Handler):
 
         if subject and content:
             content = content.replace('\n','<br>')
-            p = Post(parent = blog_key(), subject = subject, content = content, author = self.logged())
+            p = Post(parent = blog_key(), subject = subject, content = content, author = self.logged(), post_likes = 0)
             p.put()
             self.redirect('/%s' % str(p.key().id()))
             

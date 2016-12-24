@@ -422,6 +422,9 @@ body {
     .comments{
         width: 60vw;
     }
+    .hr-comment{
+    width: 60vw;
+    }
 }
 .comment {
     overflow: hidden;
@@ -505,4 +508,5 @@ body {
     -ms-transform: rotate(45deg);
     -o-transform: rotate(45deg);
 }
+
 /*--Comments-Style-Close-*/
