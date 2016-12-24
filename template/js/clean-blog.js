@@ -37,6 +37,30 @@ jQuery(document).ready(function($) {
                 this.previousTop = currentTop;
             });
     }
+    function getQueryVariable(variable)
+        {
+               var query = window.location.search.substring(1);
+               var vars = query.split("&");
+               for (var i=0;i<vars.length;i++) {
+                       var pair = vars[i].split("=");
+                       if(pair[0] == variable){return pair[1];}
+               }
+               return(false);
+        }
+
+        var errors = {
+            "emptyCmnt": "Comment Can't Be Empty!",
+            "notLogged": "Action requires User LogIn!"
+        };
+
+        if(getQueryVariable('error')){
+            var error = errors[getQueryVariable('error')];
+            var $message = $("#message");
+            $message.removeClass("hide");
+            var content = document.createTextNode(error);
+            $message.append(content);
+            
+        }
 });
 
 

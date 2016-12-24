@@ -107,7 +107,27 @@ class PostPage(Handler):
         #new_comment.put()
         comments = Comments.all()
         comments.ancestor(key)
+        comments.order('last_modified')
         self.render("post.html", post = post, user = self.logged(), comments = comments)
+    def post(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        
+        if not post:
+            self.error(404)
+            return
+        user = self.logged()
+        content = self.request.get('comment')
+        if user:
+            if content:
+                comment = Comments(parent = post, author = user, content = content)
+                comment.put()
+                self.redirect('/%s' % str(post.key().id()))
+            else:
+                self.redirect('/%s?error=emptyCmnt' % str(post.key().id()))
+        else:
+            self.redirect('/%s?error="notLogged"' % str(post.key().id()))
+        
 class DeletePost(Handler):
     def get(self,post_id):
         key = db.Key.from_path('Post',int(post_id), parent=blog_key())

@@ -26,8 +26,17 @@
             </div>
         </div>
     </article>
-
+    
     <hr class="hr-comment">
+    <div class="error container">
+        <div class="row">
+            <div class="col-md-offset-3 col-md-6">
+                <div class="alert alert-danger hide" role="alert" id="message">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+    </div>
     {% for comment in comments %}
     <!-- Comments -->
     <section class="comments">
@@ -46,12 +55,13 @@
     </section>
     {% endfor %}
     {% if user %}
+    
     <div class="container margin-bottom">
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                    <form method="post">
                     <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Write your Comment..." >
+                      <input type="text" class="form-control" placeholder="Write your Comment..." name="comment" required>
                       <span class="input-group-btn">
                         <button class="btn btn-default no-padding" type="submit">Submit</button>
                       </span>
