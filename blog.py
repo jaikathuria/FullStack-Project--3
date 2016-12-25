@@ -34,6 +34,8 @@ class Comments(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
     last_modified = db.DateTimeProperty(auto_now = True)
     
+class Likes(db.Model):
+    user_id = db.IntegerProperty(required = True)
     
 class User_db(db.Model):
     fname = db.StringProperty(required = True)
@@ -77,6 +79,21 @@ class Handler(webapp2.RequestHandler):
         
     def logged(self):
         return self.read_secure_cookie("username")
+    
+    def liked(self,username,post_key):
+        if username:
+            user = db.GqlQuery("SELECT * FROM User_db WHERE username = :user", user = username )
+            user_id = user.get().key().id()
+            like = Likes.all()
+            like.ancestor(post_key)
+            like.filter("user_id = ",user_id)
+            like = like.get()
+            if like:
+                return like
+            else:
+                return False
+        else:
+            return False
         
     
 def hash_password(password):
@@ -108,7 +125,9 @@ class PostPage(Handler):
         comments = Comments.all()
         comments.ancestor(key)
         comments.order('last_modified')
-        self.render("post.html", post = post, user = self.logged(), comments = comments)
+        username = self.logged()
+        like = self.liked(username,key)
+        self.render("post.html", post = post, user = username, comments = comments,like = like)
     def post(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
@@ -119,6 +138,7 @@ class PostPage(Handler):
         content = self.request.get('comment')
         if user:
             if content:
+                content = content.replace('\n','<br>')
                 comment = Comments(parent = key, author = user, content = content)
                 comment.put()
                 self.redirect('/%s' % str(post.key().id()))
@@ -128,6 +148,37 @@ class PostPage(Handler):
             self.redirect('/%s?error="notLogged"' % str(post.key().id()))
             
             
+class Like(Handler):
+    def get(self,post_id):
+        key = db.Key.from_path('Post',int(post_id), parent=blog_key())
+        post =db.get(key)
+        if not post:
+            self.error(404)
+            return
+        user = self.logged()
+        if user:
+            like = self.liked(user,key)
+            if not like:
+                user = db.GqlQuery("SELECT * FROM User_db WHERE username = :user", user = user )
+                user = user.get()
+                user_id = user.key().id()
+                if post.author == self.logged():
+                    self.redirect("/%s?error=ownPost" % post_id)
+                else:  
+                    new_like = Likes(parent = key,user_id = user_id)
+                    new_like.put()
+                    post.post_likes += 1
+                    post.put()
+                    self.redirect("/%s" % post_id)
+            elif like:
+                like.delete()
+                post.post_likes -= 1
+                post.put()
+                self.redirect("/%s" % post_id)
+        else:
+            self.redirect("/%s?error=notLogged" % post_id)
+            
+        
         
 class DeletePost(Handler):
     def get(self,post_id):
@@ -143,16 +194,17 @@ class DeletePost(Handler):
                 post.delete()
                 self.redirect('/')
             else:
-                self.redirect('/')
+                self.redirect('/%s?error=notPostOwner')
             
         
 
 
 class NewPost(Handler):
     def get(self):
-        if not self.logged():
-            self.redirect("/")
-        self.render("new.html", user = self.logged())
+        if self.logged():
+            self.render("new.html", user = self.logged())
+        else:
+            self.redirect("/login")
     def post(self):
         subject = self.request.get('subject')
         content = self.request.get('content')
@@ -162,6 +214,49 @@ class NewPost(Handler):
             p = Post(parent = blog_key(), subject = subject, content = content, author = self.logged(), post_likes = 0)
             p.put()
             self.redirect('/%s' % str(p.key().id()))
+        else:
+            self.render("new.html", user = self.logged(), error = "Fields Can't Be Enpty")
+            
+            
+            
+class EditPost(Handler):
+    def get(self,post_id):
+        user = self.logged()
+        if user:
+            pkey = db.Key.from_path('Post',int(post_id), parent=blog_key())
+            post = db.get(pkey)
+            if not post:
+                self.error(404)
+                return
+            if user != post.author:
+                self.redirect('/%s?error=notPostOwner' % post_id)
+            else:
+                self.render("edit.html", user = self.logged(), post = post)
+        else:
+            self.redirect("/login")
+    def post(self,post_id):
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+        user = self.logged()
+        if subject and content:
+            if user:
+                pkey = db.Key.from_path('Post',int(post_id), parent=blog_key())
+                post = db.get(pkey)
+                if not post:
+                    self.error(404)
+                    return
+                if user != post.author:
+                    self.redirect('/%s?error=notPostOwner' % post_id)
+                else:
+                    content = content.replace('\n','<br>')
+                    post.content = content
+                    post.subject = subject
+                    post.put()
+                    self.redirect('/%s' % post_id)
+            else:
+                self.redirect('/%s?error=notLogged' % pkey)
+        else:
+            self.render("new.html", user = self.logged(), error = "Fields Can't Be Enpty")
             
             
             
@@ -219,7 +314,7 @@ class EditComment(Handler):
             else:
                 self.redirect('/%s?error=notCmntOwner' % post_id)
             
-
+        
         
         
 class Signup(Handler):
@@ -287,12 +382,14 @@ class Logout(Handler):
                       
 app = webapp2.WSGIApplication([('/(\d+)',PostPage),
                                ('/newpost',NewPost),
-                               ('/delete/(\d+)',DeletePost),
+                               ('/delete:(\d+)',DeletePost),
+                               ('/edit:(\d+)',EditPost),
                                ('/signup',Signup),
                                ('/login',Login),
                                ('/welcome',Welcome),
                                ('/logout',Logout),
                                ('/editcomment:(\d+)&(\d+)',EditComment),
                                ('/deletecomment:(\d+)/(\d+)',DeleteComment),
+                               ('/like:(\d+)',Like),
                                ('/?',MainPage)],
                               debug=True)

@@ -9,7 +9,11 @@
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                     <div class="post-heading">
                         <h1> {{ post.subject }} </h1>
-                        <span class="meta">Posted by <a href="/"> {{ post.author }} </a> on {{ post.created.strftime("%b %d, %Y") }}</span>
+                        <span class="meta">Posted by <a href="/"> {{ post.author }} </a> on {{ post.created.strftime("%b %d, %Y") }} 
+                        {% if post.author == user %}
+                         | <a href="/edit:{{ post.key().id() }}">Edit</a> | <a href="/delete:{{ post.key().id() }}"> Delete</a>
+                        {% endif %}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -29,8 +33,13 @@
     <hr class="hr-comment">
     
    <div class = "like">
-      <i class="i"></i>
-      <span>8 Likes </span>
+      <a href="/like:{{ post.key().id() }}">
+         <i class="i 
+          {% if like %}
+              press
+          {% endif %}"></i>
+    </a>
+      <span>{{ post.post_likes }} Likes </span>
     </div>
     
     <hr class="hr-comment">
