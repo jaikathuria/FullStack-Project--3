@@ -5,16 +5,12 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /css
-  static_dir: template/css
-- url: /js
-  static_dir: template/js
-- url: /vendor
-  static_dir: template/vendor
-- url: /img
-  static_dir: template/img
-- url:  /.*
+- url: /assets
+  static_dir: assets
+
+- url: /.*
   script: blog.app
+  
 libraries:
 - name: webapp2
   version: latest

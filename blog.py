@@ -181,7 +181,19 @@ class DeleteComment(Handler):
         else:
             self.redirect('/%s?error="notLogged"' % post_id)
         
-        
+ 
+class EditComment(Handler):
+    def get(self,post_id,comment_id):
+        user = self.logged()
+        if user:
+            pkey = db.Key.from_path('Post',int(post_id),parent=blog_key())
+            post = db.get(pkey)
+            if not post:
+                self.error(404)
+                return
+            key = db.Key.from_path('Comments',int(comment_id),parent = pkey)
+            comment = db.get(key)
+            self.render('editcomment.html',user = user,comment = comment)
         
         
 class Signup(Handler):
@@ -254,7 +266,7 @@ app = webapp2.WSGIApplication([('/(\d+)',PostPage),
                                ('/login',Login),
                                ('/welcome',Welcome),
                                ('/logout',Logout),
-                               #('/editcomment/(\d+)',EditComment),
+                               ('/editcomment/(\d+)&(\d+)',EditComment),
                                ('/deletecomment/(\d+)/(\d+)',DeleteComment),
-                               ('/',MainPage)],
+                               ('/?',MainPage)],
                               debug=True)
