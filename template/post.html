@@ -49,7 +49,11 @@
                     <div class="text">
                       <p>{{ comment.content }}</p>
                     </div>
-                    <p class="attribution">by <a>{{ comment.author }}</a> at {{ comment.last_modified.strftime("%b %d, %Y") }}</p>
+                    <p class="attribution">by <a>{{ comment.author }}</a> at {{ comment.last_modified.strftime("%b %d, %Y") }}
+                    {% if comment.author == user %}
+                     | <a href="/editcomment/{{ comment.key().id() }}">Edit</a> | <a href="/deletecomment/{{ post.key().id() }}/{{ comment.key().id() }}"> Delete</a>
+                    {% endif %}
+                     </p>
                 </div>
         </article>
     </section>

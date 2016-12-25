@@ -112,7 +112,6 @@ class PostPage(Handler):
     def post(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        
         if not post:
             self.error(404)
             return
@@ -120,13 +119,15 @@ class PostPage(Handler):
         content = self.request.get('comment')
         if user:
             if content:
-                comment = Comments(parent = post, author = user, content = content)
+                comment = Comments(parent = key, author = user, content = content)
                 comment.put()
                 self.redirect('/%s' % str(post.key().id()))
             else:
                 self.redirect('/%s?error=emptyCmnt' % str(post.key().id()))
         else:
             self.redirect('/%s?error="notLogged"' % str(post.key().id()))
+            
+            
         
 class DeletePost(Handler):
     def get(self,post_id):
@@ -162,6 +163,26 @@ class NewPost(Handler):
             p.put()
             self.redirect('/%s' % str(p.key().id()))
             
+            
+            
+class DeleteComment(Handler):
+    def get(self,post_id,comment_id):
+        user = self.logged()
+        if user:
+            pkey = db.Key.from_path('Post',int(post_id), parent=blog_key())
+            post = db.get(pkey)
+            if not post:
+                self.error(404)
+                return
+            key = db.Key.from_path('Comments', int(comment_id), parent=pkey)
+            comment = db.get(key)
+            comment.delete()
+            self.redirect('/%s' % post_id )
+        else:
+            self.redirect('/%s?error="notLogged"' % post_id)
+        
+        
+        
         
 class Signup(Handler):
     def get(self):
@@ -191,6 +212,8 @@ class Signup(Handler):
                 p = User_db(fname = fname, lname =lname, email = email,username = username, password_hash = password)
                 p.put()
                 self.redirect("/welcome")
+                
+                
 class Login(Handler):
     def get(self):
         self.render("login.html")
@@ -212,6 +235,8 @@ class Login(Handler):
                     self.render("login.html",error = error)
                 else:
                     self.login(user)
+                    
+                    
 class Logout(Handler):
     def get(self):
         if self.logged():
@@ -229,5 +254,7 @@ app = webapp2.WSGIApplication([('/(\d+)',PostPage),
                                ('/login',Login),
                                ('/welcome',Welcome),
                                ('/logout',Logout),
+                               #('/editcomment/(\d+)',EditComment),
+                               ('/deletecomment/(\d+)/(\d+)',DeleteComment),
                                ('/',MainPage)],
                               debug=True)
