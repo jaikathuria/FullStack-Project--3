@@ -50,7 +50,8 @@ jQuery(document).ready(function($) {
 
         var errors = {
             "emptyCmnt": "Comment Can't Be Empty!",
-            "notLogged": "Action requires User LogIn!"
+            "notLogged": "Action requires User LogIn!",
+            "notCmntOwner": "You Can Only Delete your Own Comments!"
         };
 
         if(getQueryVariable('error')){

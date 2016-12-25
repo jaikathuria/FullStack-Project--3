@@ -193,7 +193,33 @@ class EditComment(Handler):
                 return
             key = db.Key.from_path('Comments',int(comment_id),parent = pkey)
             comment = db.get(key)
-            self.render('editcomment.html',user = user,comment = comment)
+            if user == comment.author:
+                self.render('editcomment.html',user = user,comment = comment)
+            else:
+                self.redirect('/%s?error=notCmntOwner' % post_id)
+    def post(self,post_id,comment_id):
+        user = self.logged()
+        if user:
+            pkey = db.Key.from_path('Post',int(post_id),parent=blog_key())
+            post = db.get(pkey)
+            if not post:
+                self.error(404)
+                return
+            key = db.Key.from_path('Comments',int(comment_id),parent = pkey)
+            comment = db.get(key)
+            if user == comment.author:
+                content = self.request.get('comment')
+                if content:
+                    comment.content = content
+                    comment.put()
+                    self.redirect('/%s' % post_id)
+                else:
+                    self.redirect('/%s?error=emptyCmnt' % post_id)
+                
+            else:
+                self.redirect('/%s?error=notCmntOwner' % post_id)
+            
+        
         
         
 class Signup(Handler):
@@ -266,7 +292,7 @@ app = webapp2.WSGIApplication([('/(\d+)',PostPage),
                                ('/login',Login),
                                ('/welcome',Welcome),
                                ('/logout',Logout),
-                               ('/editcomment/(\d+)&(\d+)',EditComment),
-                               ('/deletecomment/(\d+)/(\d+)',DeleteComment),
+                               ('/editcomment:(\d+)&(\d+)',EditComment),
+                               ('/deletecomment:(\d+)/(\d+)',DeleteComment),
                                ('/?',MainPage)],
                               debug=True)
