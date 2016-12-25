@@ -62,6 +62,11 @@ jQuery(document).ready(function($) {
             $message.append(content);
             
         }
+      $(function() {
+        $( ".i" ).click(function() {
+          $( ".i,.span" ).toggleClass( "press", 1000 );
+        });
+      });
 });
 
 

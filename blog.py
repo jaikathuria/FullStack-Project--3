@@ -219,7 +219,7 @@ class EditComment(Handler):
             else:
                 self.redirect('/%s?error=notCmntOwner' % post_id)
             
-        
+
         
         
 class Signup(Handler):

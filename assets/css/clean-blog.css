@@ -516,3 +516,50 @@ body {
 .no-padding{
     padding: 6px 12px 6px 12px;
 }
+
+
+
+.like {
+  padding-top:10px;
+  text-align:center;
+  height:70px;
+  margin:0 auto;
+  position: relative;
+  margin-bottom:20px;
+}
+
+.i {
+  cursor:pointer;
+  padding:10px 12px 8px;
+  background:#eee;
+  border-radius:50%;
+  display:inline-block;
+  margin:0 0 15px;
+  color:#aaa;
+  transition:.2s;
+}
+
+.i:hover {
+  color:#666;
+}
+
+.i:before {
+  font-family:fontawesome;
+  content:'\f004';
+  font-style:normal;
+}
+
+
+
+.i.press {
+  animation: size .4s;
+  color:#e23b3b;
+}
+
+
+@keyframes size {
+  0% {padding:10px 12px 8px;}
+  50% {padding:14px 16px 12px;  
+    margin-top:-4px;}
+  100% {padding:10px 12px 8px;}
+}
