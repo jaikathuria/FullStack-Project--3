@@ -105,7 +105,7 @@ def hash_password(password):
 class MainPage(Handler):
     def get(self):
         posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
-        self.render('index.html',posts = posts,user = self.logged())
+        self.render('front.html',posts = posts,user = self.logged())
 class Welcome(Handler):
     def get(self):
         posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
