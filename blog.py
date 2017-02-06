@@ -283,10 +283,14 @@ class NewPost(Handler):
         content = self.request.get('content')
         # validation for empty subject and content
         if subject and content:
-            content = content.replace('\n','<br>')
-            p = Post(parent = blog_key(), subject = subject, content = content, author = self.logged(), post_likes = 0)
-            p.put()
-            self.redirect('/%s' % str(p.key().id()))
+            if self.logged():
+                # validates if user is logged in or not.
+                content = content.replace('\n','<br>')
+                p = Post(parent = blog_key(), subject = subject, content = content, author = self.logged(), post_likes = 0)
+                p.put()
+                self.redirect('/%s' % str(p.key().id()))
+            else:
+                self.redirect("/login")
         else:
             self.render("new.html", user = self.logged(), error = "Fields Can't Be Enpty")
 
